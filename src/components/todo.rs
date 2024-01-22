@@ -11,14 +11,15 @@ pub fn Todo<'a>(todo: &'a Todo) -> impl IntoView {
       class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
     >
       <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
-        <button
-        type="button"
-        role="checkbox"
-        aria-checked="false"
-        data-state="unchecked"
-        value="on"
-        class="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-        ></button>
+        <input
+          type="checkbox"
+          checked={todo.done}
+          class="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+          hx-trigger="click"
+          hx-target={format!("#task-{}", todo.id)}
+          hx-patch={format!("/tasks/{}/check", todo.id)}
+          hx-swap="outerHTML"
+        />
       </td>
       <td
         class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium"

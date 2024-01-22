@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex};
 use axum::{
     extract::{Path, State},
     response::Html,
-    routing::{delete, get, post},
+    routing::{delete, get, patch, post},
     Form, Router,
 };
 use components::*;
@@ -22,6 +22,24 @@ struct AppState {
 #[derive(Debug, Deserialize)]
 struct CreateTask {
     task: String,
+}
+
+async fn toggle_done(State(state): State<AppState>, Path(task_id): Path<u32>) -> Html<String> {
+    let mut todos = state.todos.lock().unwrap();
+
+    let index = todos.iter().position(|t| t.id == task_id).unwrap();
+
+    todos[index].done = !todos[index].done;
+
+    let todo = todos[index].clone();
+    let html = ssr::render_to_string(move || {
+        view! {
+            <Todo todo={&todo} />
+        }
+    })
+    .to_string();
+
+    return Html(html);
 }
 
 async fn delete_task(State(state): State<AppState>, Path(task_id): Path<u32>) {
@@ -88,6 +106,7 @@ async fn main() {
         .route("/", get(index))
         .route("/tasks", post(create_task))
         .route("/tasks/:task_id", delete(delete_task))
+        .route("/tasks/:task_id/check", patch(toggle_done))
         .with_state(state);
 
     // run our app with hyper, listening globally on port 3000
