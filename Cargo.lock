@@ -562,6 +562,7 @@ dependencies = [
  "axum-core",
  "http 1.0.0",
  "leptos",
+ "serde",
  "tokio",
 ]
 
