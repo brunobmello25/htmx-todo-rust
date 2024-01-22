@@ -34,19 +34,22 @@ async fn create_task(State(state): State<AppState>, Form(body): Form<CreateTask>
         .map(|t| t.id)
         .unwrap_or(0);
 
-    state.todos.lock().unwrap().push(Todo {
-        id: max_id + 1,
-        content: body.task,
+    let new_todo = Todo {
         done: false,
-    });
+        content: body.task,
+        id: max_id + 1,
+    };
 
-    let html = ssr::render_to_string(|| {
+    state.todos.lock().unwrap().insert(0, new_todo.clone());
+
+    let html = ssr::render_to_string(move || {
         view! {
-            <TodoList todos={state.todos} />
+            <Todo todo={&new_todo} />
         }
     });
+    let html = html.to_string();
 
-    return Html(html.to_string());
+    return Html(html);
 }
 
 async fn index(State(state): State<AppState>) -> Html<String> {

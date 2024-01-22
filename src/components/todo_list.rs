@@ -20,11 +20,11 @@ pub fn TodoList(todos: Arc<Mutex<Vec<models::todo::Todo>>>) -> impl IntoView {
         .collect_view();
 
     view! {
-    <div id="todo-list" class="border rounded-lg mt-4">
+    <div class="border rounded-lg mt-4">
         <div class="relative w-full overflow-auto">
             <div class="relative w-full overflow-auto">
                 <table class="w-full caption-bottom text-sm">
-                    <tbody class="[&amp;_tr:last-child]:border-0">
+                    <tbody id="todo-list" class="[&amp;_tr:last-child]:border-0">
                         {todos}
                     </tbody>
                 </table>
