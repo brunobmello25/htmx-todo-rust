@@ -4,9 +4,9 @@ mod models;
 use std::sync::{Arc, Mutex};
 
 use axum::{
-    extract::State,
+    extract::{Path, State},
     response::Html,
-    routing::{get, post},
+    routing::{delete, get, post},
     Form, Router,
 };
 use components::*;
@@ -22,6 +22,14 @@ struct AppState {
 #[derive(Debug, Deserialize)]
 struct CreateTask {
     task: String,
+}
+
+async fn delete_task(State(state): State<AppState>, Path(task_id): Path<u32>) {
+    let mut todos = state.todos.lock().unwrap();
+
+    let index = todos.iter().position(|t| t.id == task_id).unwrap();
+
+    todos.remove(index);
 }
 
 async fn create_task(State(state): State<AppState>, Form(body): Form<CreateTask>) -> Html<String> {
@@ -79,6 +87,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(index))
         .route("/tasks", post(create_task))
+        .route("/tasks/:task_id", delete(delete_task))
         .with_state(state);
 
     // run our app with hyper, listening globally on port 3000
